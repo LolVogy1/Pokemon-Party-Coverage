@@ -1,4 +1,4 @@
-# Pokemon-Matchup-Planner
+# Pokemon-Party-Coverage
 
 This is currently a work in progress
 
