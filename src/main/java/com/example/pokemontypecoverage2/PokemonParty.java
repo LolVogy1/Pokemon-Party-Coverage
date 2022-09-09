@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+package com.example.pokemontypecoverage2;
 
 // Pokémon party class
 public class PokemonParty {

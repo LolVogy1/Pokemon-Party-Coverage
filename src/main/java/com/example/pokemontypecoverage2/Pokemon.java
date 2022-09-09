@@ -1,3 +1,5 @@
+package com.example.pokemontypecoverage2;
+
 // Pokémon class
 public class Pokemon {
     // Has 1-2 types

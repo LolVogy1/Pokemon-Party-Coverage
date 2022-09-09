@@ -1,3 +1,5 @@
+package com.example.pokemontypecoverage2;
+
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +16,7 @@ public class PokemonTypeChart {
     // Reads the type chart file and builds a list of matchups
     // Has a nested loop but only runs once so ok I guess
     public void buildTypeChart()throws FileNotFoundException {
-        File file = new File("pokemontypechart.txt");
+        File file = new File("com/example/pokemontypecoverage2/pokemontypechart.txt");
         Scanner scanner = new Scanner(file);
         //
         while (scanner.hasNextLine()){

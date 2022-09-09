@@ -1,3 +1,5 @@
+package com.example.pokemontypecoverage2;
+
 import java.util.ArrayList;
 
 public class PokemonType {
