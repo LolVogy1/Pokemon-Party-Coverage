@@ -24,21 +24,23 @@ public class HelloApplication extends Application {
         // Create scene graph
         Group root = new Group();
         // Create scene
-        Scene scene = new Scene(root, 1920, 1080);
+        Scene scene = new Scene(root, 800, 600);
+        //Create an observablelist to add nodes to
+        ObservableList list = root.getChildren();
 
         // Set scene stuff
         stage.setTitle("Pokemon Party Coverage");
         // Add a title
         Text pokeTitle = new Text();
         pokeTitle.setFont(new Font(28));
-        pokeTitle.setX(800);
+        pokeTitle.setX(250);
         pokeTitle.setY(100);
         pokeTitle.setText("Pokemon Party Coverage");
 
         // Add pikachu
         Image image = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/pikachu.jpg"));
         ImageView imageview1 = new ImageView(image);
-        imageview1.setX(920);
+        imageview1.setX(370);
         imageview1.setY(120);
         imageview1.setFitHeight(75);
         imageview1.setFitWidth(150);
@@ -47,22 +49,49 @@ public class HelloApplication extends Application {
         // Add Type Image
         Image typeImageNormal = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Normal.jpg"));
         ImageView imageViewNormal = new ImageView(typeImageNormal);
-        imageViewNormal.setX(1600);
-        imageViewNormal.setY(200);
-        imageViewNormal.setFitWidth(50);
-        imageViewNormal.setFitHeight(19);
-        imageViewNormal.setPreserveRatio(true);
+        setImageView(imageViewNormal, 600, 200, list);
 
         // Add drop destination
-        // TODO: repeat for party.
-        // TODO: Find a way to do this efficiently
-        Image typeImageBlank1 = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Blank.jpg"));
-        ImageView imageViewBlank1 = new ImageView(typeImageBlank1);
-        imageViewBlank1.setX(600);
-        imageViewBlank1.setY(200);
-        imageViewBlank1.setFitWidth(50);
-        imageViewBlank1.setFitHeight(19);
-        imageViewBlank1.setPreserveRatio(true);
+        //Create a new image
+        Image typeImageBlank = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Blank.jpg"));
+        //Create an imageView using the blank type image
+        ImageView imageViewBlank1 = new ImageView(typeImageBlank);
+        //set dimensions and stuff
+        setImageView(imageViewBlank1, 200, 200, list);
+
+        // Copy the above for the whole party
+        ImageView imageViewBlank2 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank2, 200, 220, list);
+
+        ImageView imageViewBlank3 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank3, 200, 260, list);
+
+        ImageView imageViewBlank4 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank4, 200, 280, list);
+
+        ImageView imageViewBlank5 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank5, 200, 320, list);
+
+        ImageView imageViewBlank6 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank6, 200, 340, list);
+
+        ImageView imageViewBlank7 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank7, 200, 380, list);
+
+        ImageView imageViewBlank8 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank8, 200, 400, list);
+
+        ImageView imageViewBlank9 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank9, 200, 440, list);
+
+        ImageView imageViewBlank10 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank10, 200, 460, list);
+
+        ImageView imageViewBlank11 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank11, 200, 500, list);
+
+        ImageView imageViewBlank12 = new ImageView(typeImageBlank);
+        setImageView(imageViewBlank12, 200, 520, list);
 
         /***** Make the image draggable *****/
 
@@ -101,15 +130,21 @@ public class HelloApplication extends Application {
         });
 
         // Add to scene graph
-        ObservableList list = root.getChildren();
         list.add(pokeTitle);
         list.add(imageview1);
-        list.add(imageViewNormal);
-        list.add(imageViewBlank1);
 
         // Show scene
         stage.setScene(scene);
         stage.show();
+    }
+    //sets values for an imageview to avoid repeating code 500 times
+    public void setImageView(ImageView view, double xVal, double yVal, ObservableList list){
+        view.setX(xVal);
+        view.setY(yVal);
+        view.setFitHeight(19);
+        view.setFitWidth(50);
+        view.setPreserveRatio(true);
+        list.add(view);
     }
 
 
