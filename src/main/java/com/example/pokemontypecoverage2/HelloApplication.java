@@ -52,11 +52,32 @@ public class HelloApplication extends Application {
         setImageView(imageViewNormal, 600, 200, list);
 
         // Add drop destination
-        //Create a new image
+        // Create a new image
         Image typeImageBlank = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Blank.jpg"));
-        //Create an imageView using the blank type image
+
+        // Create an imageView using the blank type image
+        ImageView[] blankImageList = new ImageView[12];
+
+        // Initial y position of blank tile
+        // It will be incremented
+        int j = 200;
+        for(int i = 0; i <=11; i++){
+            blankImageList[i] =  new ImageView(typeImageBlank);
+            blankImageList[i].setId("blankTile"+i);
+            setImageView(blankImageList[i],200, j , list);
+            // If i is even (basically every 2 iterations)
+            // we want to add a larger gap between the images
+            if(i % 2 == 0){
+                j += 20;
+            }
+            else{
+                j += 40;
+            }
+        }
+        // Hopefully redundant
+        /*
         ImageView imageViewBlank1 = new ImageView(typeImageBlank);
-        //set dimensions and stuff
+        // Set dimensions and stuff
         setImageView(imageViewBlank1, 200, 200, list);
 
         // Copy the above for the whole party
@@ -92,6 +113,8 @@ public class HelloApplication extends Application {
 
         ImageView imageViewBlank12 = new ImageView(typeImageBlank);
         setImageView(imageViewBlank12, 200, 520, list);
+        */
+
 
         /***** Make the image draggable *****/
 
@@ -110,6 +133,7 @@ public class HelloApplication extends Application {
         imageViewNormal.setOnDragOver(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent dragEvent) {
+                //if the tile is not the source and the tile has an image
                 if (dragEvent.getGestureSource() != imageViewNormal && dragEvent.getDragboard().hasImage()){
                     dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                 }
@@ -122,8 +146,8 @@ public class HelloApplication extends Application {
             public void handle(DragEvent dragEvent) {
                 Dragboard db = dragEvent.getDragboard();
                 if (db.hasImage()){
-                    // TODO: change to find imageview that is being replaced, rather than hardcoding
-                    imageViewBlank1.setImage(db.getImage());
+                    // Get id of target and replace the image
+
                 }
                 dragEvent.consume();
             }
@@ -145,6 +169,10 @@ public class HelloApplication extends Application {
         view.setFitWidth(50);
         view.setPreserveRatio(true);
         list.add(view);
+    }
+    // Replace the image of a tile using drag and drop
+    public void replaceImage(ImageView view, Dragboard db){
+        view.setImage(db.getImage());
     }
 
 
