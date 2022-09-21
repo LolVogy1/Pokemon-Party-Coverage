@@ -55,103 +55,52 @@ public class HelloApplication extends Application {
         // Create a new image
         Image typeImageBlank = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Blank.jpg"));
 
-        // Create an imageView using the blank type image
+        // Create a list of imageViews using the blank type image
         ImageView[] blankImageList = new ImageView[12];
+
+        // Create a list of imageViews using the various type images
+        ImageView[] typeList = new ImageView[18];
+
+        // Make a list of the file names
+        String[] typeNameList = {"Type_Normal","Type_Fire","Type_Water","Type_Electric","Type_Grass","Type_Ice","Type_Fighting","Type_Poison",
+                "Type_Ground", "Type_Flying","Type_Psychic","type-bug","Type_Rock","Type_Ghost","Type_Dragon","Type_Dark","Type_Steel",
+                "Type_Fairy",};
+
+        int j1 = 200;
+        String pathString = "src/main/resources/com/example/pokemontypecoverage2/types/";
+        for (int i = 0; i <= 17; i++){
+            Image typeImage = new Image(new FileInputStream(pathString+typeNameList[i]+".jpg"));
+            typeList[i] = new ImageView(typeImage);
+            setImageView(typeList[i],600, j1, list);
+            // Increase the y position of the next tile
+            j1+= 20;
+            // Add a drag started event to the tile
+            setDragStarted(typeList[i]);
+
+        }
 
         // Initial y position of blank tile
         // It will be incremented
-        int j = 200;
+        int j2 = 200;
         for(int i = 0; i <=11; i++){
+            // Create a new ImageView
             blankImageList[i] =  new ImageView(typeImageBlank);
             blankImageList[i].setId("blankTile"+i);
-            setImageView(blankImageList[i],200, j , list);
+            // Adjust properties
+            setImageView(blankImageList[i],200, j2 , list);
+            // Add darg and drop events
+            setDragOver(blankImageList[i]);
+            setDragDropped(blankImageList[i]);
+            // Increase the y position of the next tile
             // If i is even (basically every 2 iterations)
-            // we want to add a larger gap between the images
+            // Add a larger gap between the images
             if(i % 2 == 0){
-                j += 20;
+                j2 += 20;
             }
             else{
-                j += 40;
+                j2 += 40;
             }
         }
-        // Hopefully redundant
-        /*
-        ImageView imageViewBlank1 = new ImageView(typeImageBlank);
-        // Set dimensions and stuff
-        setImageView(imageViewBlank1, 200, 200, list);
-
-        // Copy the above for the whole party
-        ImageView imageViewBlank2 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank2, 200, 220, list);
-
-        ImageView imageViewBlank3 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank3, 200, 260, list);
-
-        ImageView imageViewBlank4 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank4, 200, 280, list);
-
-        ImageView imageViewBlank5 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank5, 200, 320, list);
-
-        ImageView imageViewBlank6 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank6, 200, 340, list);
-
-        ImageView imageViewBlank7 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank7, 200, 380, list);
-
-        ImageView imageViewBlank8 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank8, 200, 400, list);
-
-        ImageView imageViewBlank9 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank9, 200, 440, list);
-
-        ImageView imageViewBlank10 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank10, 200, 460, list);
-
-        ImageView imageViewBlank11 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank11, 200, 500, list);
-
-        ImageView imageViewBlank12 = new ImageView(typeImageBlank);
-        setImageView(imageViewBlank12, 200, 520, list);
-        */
-
-
-        /***** Make the image draggable *****/
-
-        // Copy image to clipboard when dragging the image
-        imageViewNormal.setOnDragDetected((MouseEvent event) ->{
-            Dragboard db = imageViewNormal.startDragAndDrop(TransferMode.ANY);
-            ClipboardContent content = new ClipboardContent();
-            content.putImage(imageViewNormal.getImage());
-            db.setContent(content);
-            event.consume();
-
-        });
-
-        // Get image that is dragged over (the one that will be replaced)
-        //TODO: Find a way to do this for a group of destination and source ndoes
-        imageViewNormal.setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                //if the tile is not the source and the tile has an image
-                if (dragEvent.getGestureSource() != imageViewNormal && dragEvent.getDragboard().hasImage()){
-                    dragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                }
-                dragEvent.consume();
-            }
-        });
-
-        imageViewNormal.setOnDragDone(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                Dragboard db = dragEvent.getDragboard();
-                if (db.hasImage()){
-                    // Get id of target and replace the image
-
-                }
-                dragEvent.consume();
-            }
-        });
 
         // Add to scene graph
         list.add(pokeTitle);
@@ -170,11 +119,60 @@ public class HelloApplication extends Application {
         view.setPreserveRatio(true);
         list.add(view);
     }
+
     // Replace the image of a tile using drag and drop
     public void replaceImage(ImageView view, Dragboard db){
         view.setImage(db.getImage());
     }
 
+    // Set Drag Started event for an ImageView
+    public void setDragStarted(ImageView view){
+
+        view.setOnDragDetected((MouseEvent event) ->{
+            // Allow any transfer mode
+            Dragboard db = view.startDragAndDrop(TransferMode.ANY);
+            ClipboardContent content = new ClipboardContent();
+            // Put the image on a dragboard
+            content.putImage(view.getImage());
+            db.setContent(content);
+            event.consume();
+
+        });
+
+    }
+    // Set on Drag Dropped event for an ImageView
+    public void setDragDropped(ImageView view){
+        // Create an event handler
+        EventHandler<DragEvent> eHandler = new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent dragEvent) {
+                Dragboard db = dragEvent.getDragboard();
+                if (db.hasImage()) {
+                    // Get id of target and replace the image
+                    view.setImage(db.getImage());
+
+                }
+                dragEvent.consume();
+            }
+        };
+        // Set on drag dropped for the imageview
+        view.setOnDragDropped(eHandler);
+    }
+
+    // Set Drag Over event for an Imageview
+    public void setDragOver(ImageView view){
+        EventHandler<DragEvent> eHandler = new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent dragEvent) {
+                //if the tile is not the source and the tile has an image
+                if (dragEvent.getGestureSource() != view && dragEvent.getDragboard().hasImage()){
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                }
+                dragEvent.consume();
+            }
+        };
+        view.setOnDragOver(eHandler);
+    }
 
     public static void main(String[] args) {
         launch();
