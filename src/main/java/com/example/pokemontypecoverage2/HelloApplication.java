@@ -2,9 +2,12 @@ package com.example.pokemontypecoverage2;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
@@ -13,8 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
-
-
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -46,10 +47,11 @@ public class HelloApplication extends Application {
         imageview1.setFitWidth(150);
         imageview1.setPreserveRatio(true);
 
-        // Add Type Image
-        Image typeImageNormal = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Normal.jpg"));
-        ImageView imageViewNormal = new ImageView(typeImageNormal);
-        setImageView(imageViewNormal, 600, 200, list);
+        // Make a list of the file names
+        String[] typeNameList = {"Type_Normal","Type_Fire","Type_Water","Type_Electric","Type_Grass","Type_Ice","Type_Fighting","Type_Poison",
+                "Type_Ground","Type_Flying","Type_Psychic","type-bug","Type_Rock","Type_Ghost","Type_Dragon","Type_Dark","Type_Steel",
+                "Type_Fairy"};
+
 
         // Add drop destination
         // Create a new image
@@ -61,12 +63,50 @@ public class HelloApplication extends Application {
         // Create a list of imageViews using the various type images
         ImageView[] typeList = new ImageView[18];
 
-        // Make a list of the file names
-        String[] typeNameList = {"Type_Normal","Type_Fire","Type_Water","Type_Electric","Type_Grass","Type_Ice","Type_Fighting","Type_Poison",
-                "Type_Ground", "Type_Flying","Type_Psychic","type-bug","Type_Rock","Type_Ghost","Type_Dragon","Type_Dark","Type_Steel",
-                "Type_Fairy",};
+        // Label each Pokémon's type
+        Text[] textList = new Text[6];
+        int j3 = 195;
+        for(int i = 0; i <= 5 ; i ++){
+            textList[i] = new Text("Pokémon "+(i+1));
+            textList[i].setFont(new Font(20));
+            textList[i].setX(150);
+            textList[i].setY(j3);
+            list.add(textList[i]);
+            j3 += 60;
 
-        int j1 = 200;
+        }
+        // Types that can be beaten
+        Text canBeat = new Text("Types that can be beaten");
+        canBeat.setFont(new Font(14));
+        canBeat.setX(330);
+        canBeat.setY(250);
+        list.add(canBeat);
+
+        // Types that can be resisted
+        Text canResist = new Text("Types that can be resisted");
+
+        // Missing beatables
+
+        // Missing resistables
+
+        // Add a clear all button
+        Button clearButton = new Button();
+        list.add(clearButton);
+        clearButton.setText("Clear Party");
+        clearButton.setLayoutX(370);
+        clearButton.setLayoutY(200);
+        // Reset all blank tiles
+        clearButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                for(int i = 0; i <= blankImageList.length-1; i ++){
+                    blankImageList[i].setImage(typeImageBlank);
+                }
+            }
+        });
+
+        // Add the type tiles
+        int j1 = 190;
         String pathString = "src/main/resources/com/example/pokemontypecoverage2/types/";
         for (int i = 0; i <= 17; i++){
             Image typeImage = new Image(new FileInputStream(pathString+typeNameList[i]+".jpg"));
@@ -80,17 +120,18 @@ public class HelloApplication extends Application {
         }
 
         // Initial y position of blank tile
-        // It will be incremented
         int j2 = 200;
+        // Create the blank image tiles
         for(int i = 0; i <=11; i++){
             // Create a new ImageView
             blankImageList[i] =  new ImageView(typeImageBlank);
             blankImageList[i].setId("blankTile"+i);
             // Adjust properties
             setImageView(blankImageList[i],200, j2 , list);
-            // Add darg and drop events
+            // Add drag and drop events
             setDragOver(blankImageList[i]);
             setDragDropped(blankImageList[i]);
+            addClearTile(blankImageList[i], typeImageBlank);
             // Increase the y position of the next tile
             // If i is even (basically every 2 iterations)
             // Add a larger gap between the images
@@ -108,6 +149,7 @@ public class HelloApplication extends Application {
 
         // Show scene
         stage.setScene(scene);
+        stage.getIcons().add(image);
         stage.show();
     }
     //sets values for an imageview to avoid repeating code 500 times
@@ -172,6 +214,17 @@ public class HelloApplication extends Application {
             }
         };
         view.setOnDragOver(eHandler);
+    }
+
+    // Adds clearing the tile when clicked
+    public void addClearTile(ImageView view, Image image){
+        view.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                view.setImage(image);
+                mouseEvent.consume();
+            }
+        });
     }
 
     public static void main(String[] args) {
