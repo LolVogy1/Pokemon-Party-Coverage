@@ -6,52 +6,44 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class PokemonTypeChart {
-    ArrayList<PokemonType> types;
+    PokemonType[] types;
 
     // Constructor
     public PokemonTypeChart(){
-        types = new ArrayList<PokemonType>();
+        // There's 18 types
+        types = new PokemonType[18];
     }
 
     // Reads the type chart file and builds a list of matchups
     // Has a nested loop but only runs once so ok I guess
     public void buildTypeChart()throws FileNotFoundException {
-        File file = new File("com/example/pokemontypecoverage2/pokemontypechart.txt");
+        File file = new File("src/main/java/com/example/pokemontypecoverage2/pokemontypechart.txt");
         Scanner scanner = new Scanner(file);
-        //
-        while (scanner.hasNextLine()){
+        // 18 types so 18 lines
+        for (int i = 0; i <= 17; i++) {
             String typeLine = scanner.nextLine();
             // Index 0 of this array is the type
+            // Should split into [x, [a;1, b;1, c:2]]
             String[] type = typeLine.split(":");
             // Create a pokemon type object
-            PokemonType typeObj = new PokemonType();
-            // Set type
-            typeObj.setType(type[0]);
+            types[i] = new PokemonType();
+            types[i].setType(type[0]);
+            // Should split into ["a;1", "b;2", "c;1"]
             String[] matchups = type[1].split(",");
             // add matchups to object
-            for(int i = 0; i < matchups.length; i++){
+            for (int j = 0; j < matchups.length; j++) {
                 // Splits into {type, effectiveness}
-                String[] matchup = matchups[i].split(";");
-                // If effective
-                if(matchup[1].equals("1")){
-                    typeObj.setEffectives(matchup[0]);
-                }
-                // If super effective
-                else if (matchup[1].equals("2")){
-                    typeObj.setSuperEffectives(matchup[0]);
-                }
-                else if (matchup[1].equals("0.5")){
-                    typeObj.setNotEffectives(matchup[0]);
-                }
-                else if (matchup[1].equals("0")){
-                    typeObj.setNoEffectives(matchup[0]);
-                }
+                String[] matchup = matchups[j].split(";");
+                types[i].addMatchup(Double.parseDouble(matchup[1]));
             }
-            // Add the type to list
-            types.add(typeObj);
         }
 
     }
+    public PokemonType getType(int i ){
+        return types[i];
+    }
+
+
 }
 
 
