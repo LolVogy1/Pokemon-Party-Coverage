@@ -3,11 +3,10 @@ package com.example.pokemontypecoverage2;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
@@ -27,7 +26,7 @@ public class HelloApplication extends Application {
         // Create scene
         Scene scene = new Scene(root, 800, 600);
         //Create an observablelist to add nodes to
-        ObservableList list = root.getChildren();
+        ObservableList<Node> list = root.getChildren();
 
         // Set scene stuff
         stage.setTitle("Pokemon Party Coverage");

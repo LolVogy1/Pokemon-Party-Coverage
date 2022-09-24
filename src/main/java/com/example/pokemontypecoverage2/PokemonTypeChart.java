@@ -6,16 +6,24 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class PokemonTypeChart {
-    PokemonType[] types;
+    private final PokemonType[] types;
 
     // Constructor
     public PokemonTypeChart(){
         // There's 18 types
         types = new PokemonType[18];
+        // Build the type chart
+        try {
+            buildTypeChart();
+        }
+        catch (FileNotFoundException e){
+            System.out.println(e);
+        }
     }
 
     // Reads the type chart file and builds a list of matchups
     // Has a nested loop but only runs once so ok I guess
+    // TODO: Switch to a database for simplicity
     public void buildTypeChart()throws FileNotFoundException {
         File file = new File("src/main/java/com/example/pokemontypecoverage2/pokemontypechart.txt");
         Scanner scanner = new Scanner(file);
@@ -31,10 +39,10 @@ public class PokemonTypeChart {
             // Should split into ["a;1", "b;2", "c;1"]
             String[] matchups = type[1].split(",");
             // add matchups to object
-            for (int j = 0; j < matchups.length; j++) {
+            for (String s : matchups) {
                 // Splits into {type, effectiveness}
-                String[] matchup = matchups[j].split(";");
-                types[i].addMatchup(Double.parseDouble(matchup[1]));
+                String[] matchup = s.split(";");
+                types[i].addMatchup(Double.parseDouble(matchup[1]), matchup[0]);
             }
         }
 
