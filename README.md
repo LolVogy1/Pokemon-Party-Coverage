@@ -4,7 +4,7 @@ This is currently a work in progress
 
 This is an appplication that will let you enter the types of each of the Pokemon in your party and give you the type coverages
 
-![A screenshot of the app] https://github.com/LolVogy1/Pokemon-Party-Coverage/blob/master/Screenshots/pokePlanner.PNG
+![A screenshot of the app](https://github.com/LolVogy1/Pokemon-Party-Coverage/blob/master/Screenshots/pokePlanner.PNG)
 
 Type coverages include:
 
