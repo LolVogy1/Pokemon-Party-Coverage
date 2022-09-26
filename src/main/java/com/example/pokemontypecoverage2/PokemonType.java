@@ -17,8 +17,8 @@ public class PokemonType {
     }
 
     public PokemonType(String blank){
-        matchupDict = new HashMap<>();
-        type = "None";
+            matchupDict = new HashMap<>();
+            type = blank;
     }
     // Setters
     public void setType(String t){
@@ -52,7 +52,7 @@ public class PokemonType {
 
     // Getters
 
-    public String getType(){
+    public String getTypeName(){
         return type;
     }
 

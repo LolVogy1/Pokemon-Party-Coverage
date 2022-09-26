@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class PokemonTypeChart {
-    private final PokemonType[] types;
+    private PokemonType[] types;
 
     // Constructor
     public PokemonTypeChart(){
@@ -42,13 +42,22 @@ public class PokemonTypeChart {
             for (String s : matchups) {
                 // Splits into {type, effectiveness}
                 String[] matchup = s.split(";");
-                types[i].addMatchup(Double.parseDouble(matchup[1]), matchup[0]);
+                types[i].addMatchup(Double.parseDouble(matchup[1]), matchup[0].trim());
             }
         }
 
     }
-    public PokemonType getType(int i ){
-        return types[i];
+    public PokemonType[] getTypeChart(){
+        return types;
+    }
+    public PokemonType getType(String typeName ){
+        PokemonType type = new PokemonType();
+        for (PokemonType typeElement: types){
+            if(typeElement.getTypeName().equals(typeName)){
+                type = typeElement;
+            }
+        }
+        return type;
     }
 
 
