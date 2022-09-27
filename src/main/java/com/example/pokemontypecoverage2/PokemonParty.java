@@ -88,9 +88,13 @@ public class PokemonParty {
         return resistances;
     }
 
+    public Pokemon getPokemon(int pos){
+        return party[pos];
+    }
+
 
     // Inner Pokémon class
-    private static class Pokemon {
+    class Pokemon {
         // Has 1-2 types
         // Type 2 can be set to None
         private PokemonType type1;
@@ -114,6 +118,16 @@ public class PokemonParty {
 
         public void setType2(PokemonType t2){
             type2 = t2;
+        }
+
+        public void resetType(int typePos){
+            PokemonType blankType = new PokemonType("None");
+            if (typePos == 1){
+                type1 = blankType;
+            }
+            else{
+                type2 = blankType;
+            }
         }
 
         // Set the super effective matchups for the given Pokémon

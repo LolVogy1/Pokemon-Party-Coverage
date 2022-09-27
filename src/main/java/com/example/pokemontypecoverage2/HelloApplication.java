@@ -17,6 +17,8 @@ import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HelloApplication extends Application {
     @Override
@@ -27,6 +29,13 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(root, 800, 600);
         //Create an observablelist to add nodes to
         ObservableList<Node> list = root.getChildren();
+
+        // Create an empty Pokémon party
+        PokemonParty pokeParty = new PokemonParty();
+
+        // Create hashmaps linking tiles to Pokémon and types
+        HashMap<String, String> typeMap = new HashMap<>();
+        HashMap<String, String> pokeMap = new HashMap<>();
 
         // Set scene stuff
         stage.setTitle("Pokemon Party Coverage");
@@ -83,10 +92,41 @@ public class HelloApplication extends Application {
 
         // Types that can be resisted
         Text canResist = new Text("Types that can be resisted");
+        canResist.setFont(new Font(14));
+        canResist.setX(330);
+        canResist.setY(400);
+        list.add(canResist);
 
         // Missing beatables
 
         // Missing resistables
+
+
+        // Add the type tiles
+        int j1 = 190;
+        String pathString = "src/main/resources/com/example/pokemontypecoverage2/types/";
+        for (int i = 0; i <= 17; i++){
+            Image typeImage = new Image(new FileInputStream(pathString+typeNameList[i]+".jpg"));
+            typeList[i] = new ImageView(typeImage);
+            typeList[i].setId("Type"+i);
+            setImageView(typeList[i],600, j1, list);
+            // Increase the y position of the next tile
+            j1+= 20;
+            // Add a drag started event to the tile
+            setDragStarted(typeList[i]);
+
+        }
+        // Generate blank image tiles
+        setBlankTiles(blankImageList, typeImageBlank, list);
+        // Create type HashMap
+        typeMap = setTypeHashMap(typeList);
+        // Create Pokémon HashMap
+        pokeMap = setPartyHashMap(blankImageList);
+
+        // Add event functions to blank tiles
+        setBlankTileEvents(blankImageList, typeImageBlank, pokeParty, pokeMap, typeMap);
+
+
 
         // Add a clear all button
         Button clearButton = new Button();
@@ -95,52 +135,7 @@ public class HelloApplication extends Application {
         clearButton.setLayoutX(370);
         clearButton.setLayoutY(200);
         // Reset all blank tiles
-        clearButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                for(int i = 0; i <= blankImageList.length-1; i ++){
-                    blankImageList[i].setImage(typeImageBlank);
-                }
-            }
-        });
-
-        // Add the type tiles
-        int j1 = 190;
-        String pathString = "src/main/resources/com/example/pokemontypecoverage2/types/";
-        for (int i = 0; i <= 17; i++){
-            Image typeImage = new Image(new FileInputStream(pathString+typeNameList[i]+".jpg"));
-            typeList[i] = new ImageView(typeImage);
-            setImageView(typeList[i],600, j1, list);
-            // Increase the y position of the next tile
-            j1+= 20;
-            // Add a drag started event to the tile
-            setDragStarted(typeList[i]);
-
-        }
-
-        // Initial y position of blank tile
-        int j2 = 200;
-        // Create the blank image tiles
-        for(int i = 0; i <=11; i++){
-            // Create a new ImageView
-            blankImageList[i] =  new ImageView(typeImageBlank);
-            blankImageList[i].setId("blankTile"+i);
-            // Adjust properties
-            setImageView(blankImageList[i],200, j2 , list);
-            // Add drag and drop events
-            setDragOver(blankImageList[i]);
-            setDragDropped(blankImageList[i]);
-            addClearTile(blankImageList[i], typeImageBlank);
-            // Increase the y position of the next tile
-            // If i is even (basically every 2 iterations)
-            // Add a larger gap between the images
-            if(i % 2 == 0){
-                j2 += 20;
-            }
-            else{
-                j2 += 40;
-            }
-        }
+        setClearButton(clearButton, blankImageList, typeImageBlank, pokeParty);
 
         // Add to scene graph
         list.add(pokeTitle);
@@ -151,6 +146,7 @@ public class HelloApplication extends Application {
         stage.getIcons().add(image);
         stage.show();
     }
+
     //sets values for an imageview to avoid repeating code 500 times
     public void setImageView(ImageView view, double xVal, double yVal, ObservableList list){
         view.setX(xVal);
@@ -161,9 +157,123 @@ public class HelloApplication extends Application {
         list.add(view);
     }
 
-    // Replace the image of a tile using drag and drop
-    public void replaceImage(ImageView view, Dragboard db){
-        view.setImage(db.getImage());
+    // Creates an ImageView for blank tiles and adds drag and drop functionality for each one
+    public void setBlankTiles(ImageView[] blankImageList, Image typeImageBlank, ObservableList<Node> list){
+        // Initial y position of blank tile
+        int j2 = 200;
+        // Create the blank image tiles
+        for(int i = 0; i <=11; i++){
+            // Create a new ImageView
+            blankImageList[i] =  new ImageView(typeImageBlank);
+            blankImageList[i].setId("blankTile"+i);
+            // Adjust properties
+            setImageView(blankImageList[i],200, j2 , list);
+            // Increase the y position of the next tile
+            // If i is even (basically every 2 iterations)
+            // Add a larger gap between the images
+            if(i % 2 == 0){
+                j2 += 20;
+            }
+            else{
+                j2 += 40;
+            }
+        }
+    }
+
+
+    // Add drag events to blank tiles
+    public void setBlankTileEvents(ImageView[] blankImageList, Image typeImageBlank, PokemonParty party, HashMap<String, String> pokeMap, HashMap<String, String> typeMap){
+        for(ImageView view: blankImageList) {
+            // Add drag and drop events
+            setDragOver(view);
+            setDragDropped(view, pokeMap, typeMap, party);
+            addClearTile(view, typeImageBlank, pokeMap, party);
+        }
+    }
+
+    // Generates a hashmap of ImageViews (by ID) to Pokémon and their type slots
+    public HashMap<String, String> setPartyHashMap(ImageView[] viewList){
+        HashMap<String, String> pokeTypeHashMap = new HashMap<>();
+        int pokePos = 0;
+        int typePos = 1;
+        for(ImageView view: viewList){
+            // Get the ID of the view
+            String viewID = view.getId();
+            // Create a string "xy" x= Pokémon position in party, y = position of type (1 or 2)
+            String pokeTypePos = String.valueOf(pokePos) +","+ String.valueOf(typePos);
+            pokeTypeHashMap.put(viewID,pokeTypePos);
+            typePos += 1;
+            // Every 2 types we go to the next Pokémon and reset the type position
+            if(typePos > 2){
+                typePos = 1;
+                pokePos += 1;
+            }
+        }
+
+        return pokeTypeHashMap;
+
+    }
+
+    // Creates a hashmap of ImageViews (by ID) to Pokémon types
+    public HashMap<String, String> setTypeHashMap(ImageView[] typeList){
+        String[] stringTypeList = {"Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Grass", "Flying", "Psychic", "Bug", "Rock", "Ghost",
+        "Dragon", "Dark", "Steel", "Fairy"};
+        HashMap<String, String> typeViewHashMap = new HashMap<>();
+        for(int i = 0 ; i <= typeList.length-1 ; i++){
+            String viewID = typeList[i].getId();
+            typeViewHashMap.put(viewID, stringTypeList[i]);
+
+        }
+        return typeViewHashMap;
+    }
+
+
+    public void resetPokemonType(String pos, PokemonParty party) {
+        String[] posList = pos.split(",");
+        // Get the Pokémon
+        PokemonParty.Pokemon pokemon = party.getPokemon(Integer.parseInt(posList[0]));
+        // Reset its type
+        pokemon.resetType(Integer.parseInt(posList[1]));
+
+    }
+
+    // Set one of the types for a Pokémon
+    public void setPokemonType(String pos, PokemonParty party, String pokeType){
+        String[] posList = pos.split(",");
+        PokemonParty.Pokemon pokemon = party.getPokemon(Integer.parseInt(posList[0]));
+        if(Integer.parseInt(posList[1]) == 1){
+            pokemon.setType1(party.getTypeChart().getType(pokeType));
+        }
+        else if(Integer.parseInt(posList[1]) == 2){
+            pokemon.setType2(party.getTypeChart().getType(pokeType));
+        }
+    }
+
+    // Generates type tiles for all super effective types
+    // TODO: write this out
+    // TODO: Find a way to update this whenever anything changes
+    public void setSuperEffectiveTiles(ArrayList<String> superEffectiveList, ImageView typeViewList ){
+
+    }
+
+    // set button to reset image on blank tiles and reset types for each Pokémon
+    public void setClearButton(Button button, ImageView[] blankImageList, Image typeImageBlank, PokemonParty party){
+        EventHandler<ActionEvent> action = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                // Set all the tiles to blank
+                for(ImageView view: blankImageList){
+                    view.setImage(typeImageBlank);
+                }
+                // Reset the type for each Pokémon
+                for(int i = 0; i <= 5; i++){
+                    PokemonParty.Pokemon pokemon = party.getPokemon(i);
+                    pokemon.resetType(1);
+                    pokemon.resetType(2);
+                }
+            }
+        };
+        button.setOnAction(action);
     }
 
     // Set Drag Started event for an ImageView
@@ -175,29 +285,13 @@ public class HelloApplication extends Application {
             ClipboardContent content = new ClipboardContent();
             // Put the image on a dragboard
             content.putImage(view.getImage());
+            // Copy the ID
+            content.putString(view.getId());
             db.setContent(content);
             event.consume();
 
         });
 
-    }
-    // Set on Drag Dropped event for an ImageView
-    public void setDragDropped(ImageView view){
-        // Create an event handler
-        EventHandler<DragEvent> eHandler = new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                Dragboard db = dragEvent.getDragboard();
-                if (db.hasImage()) {
-                    // Get id of target and replace the image
-                    view.setImage(db.getImage());
-
-                }
-                dragEvent.consume();
-            }
-        };
-        // Set on drag dropped for the imageview
-        view.setOnDragDropped(eHandler);
     }
 
     // Set Drag Over event for an Imageview
@@ -206,7 +300,7 @@ public class HelloApplication extends Application {
             @Override
             public void handle(DragEvent dragEvent) {
                 //if the tile is not the source and the tile has an image
-                if (dragEvent.getGestureSource() != view && dragEvent.getDragboard().hasImage()){
+                if (dragEvent.getGestureSource() != view && dragEvent.getDragboard().hasImage() && dragEvent.getDragboard().hasString()){
                     dragEvent.acceptTransferModes(TransferMode.COPY);
                 }
                 dragEvent.consume();
@@ -215,16 +309,48 @@ public class HelloApplication extends Application {
         view.setOnDragOver(eHandler);
     }
 
+    // Set on Drag Dropped event for an ImageView
+    public void setDragDropped(ImageView view, HashMap<String, String> pokeMap, HashMap<String, String> typeMap, PokemonParty party){
+        // Create an event handler
+        EventHandler<DragEvent> eHandler = new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent dragEvent) {
+                Dragboard db = dragEvent.getDragboard();
+                if (db.hasImage() && db.hasString()) {
+                    // Get id of target and replace the image
+                    view.setImage(db.getImage());
+                    // Get the String of the type being set from the ImageView
+                    String newType = typeMap.get(db.getString());
+                    // Get the Pokémon and type slot
+                    String pokeSlot = pokeMap.get(view.getId());
+                    setPokemonType(pokeSlot, party, newType);
+                }
+                dragEvent.consume();
+            }
+        };
+        // Set on drag dropped for the imageview
+        view.setOnDragDropped(eHandler);
+    }
+
+
     // Adds clearing the tile when clicked
-    public void addClearTile(ImageView view, Image image){
+    public void addClearTile(ImageView view, Image image, HashMap<String, String> typeMap, PokemonParty party){
         view.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 view.setImage(image);
+                // Get the ID of the ImageView
+                String viewID = view.getId();
+                // FInd the Pokemon and type slot it maps to
+                String pos = typeMap.get(viewID);
+                // Reset the Pokemons type
+                resetPokemonType(pos, party);
                 mouseEvent.consume();
+
             }
         });
     }
+
 
     public static void main(String[] args) {
         launch();
