@@ -1,8 +1,9 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
 public class Test {
 
     public static void main(String[] args){
+        /*
         // Make a new party object
         PokemonParty party = new PokemonParty();
         party.setPokemonType(0, 1,party.getTypeChart().getType("Water"));
@@ -20,6 +21,7 @@ public class Test {
         }
         System.out.println("Super Effective: "+party.getSuperEffectives());
         System.out.println("Resistant to: "+party.getResistances());
+        */
 
     }
 }

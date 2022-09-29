@@ -65,7 +65,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.example.pokemontypecoverage2/com.example.pokemontypecoverage2.HelloApplication
+                                com.example.pokemontypecoverage2/com.example.pokemontypecoverage.HelloApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

@@ -1,6 +1,5 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class PokemonType {

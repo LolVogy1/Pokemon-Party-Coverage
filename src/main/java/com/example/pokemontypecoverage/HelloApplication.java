@@ -1,4 +1,4 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,8 +35,17 @@ public class HelloApplication extends Application {
         PokemonParty pokeParty = new PokemonParty();
 
         // Create hashmaps linking tiles to Pokémon and types
-        HashMap<String, String> typeMap = new HashMap<>();
-        HashMap<String, String> pokeMap = new HashMap<>();
+        HashMap<String, String> typeMap;
+        HashMap<String, String> pokeMap;
+        HashMap<String, String> typeImageMap = new HashMap<>();
+
+        // Create the super Effective ImageViews
+        ImageView[] superEffectiveImageList = new ImageView[18];
+        createMiddleTiles(superEffectiveImageList, 270, list);
+
+        // Create the resisted ImageViews
+        ImageView[] resistedImageList = new ImageView[18];
+        createMiddleTiles(resistedImageList, 420, list);
 
         // Set scene stuff
         stage.setTitle("Pokemon Party Coverage");
@@ -47,7 +57,7 @@ public class HelloApplication extends Application {
         pokeTitle.setText("Pokemon Party Coverage");
 
         // Add pikachu
-        Image image = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/pikachu.jpg"));
+        Image image = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage/pikachu.jpg"));
         ImageView imageview1 = new ImageView(image);
         imageview1.setX(370);
         imageview1.setY(120);
@@ -59,11 +69,19 @@ public class HelloApplication extends Application {
         String[] typeNameList = {"Type_Normal","Type_Fire","Type_Water","Type_Electric","Type_Grass","Type_Ice","Type_Fighting","Type_Poison",
                 "Type_Ground","Type_Flying","Type_Psychic","type-bug","Type_Rock","Type_Ghost","Type_Dragon","Type_Dark","Type_Steel",
                 "Type_Fairy"};
+        // List of type names
+        String[] stringTypeList = {"Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost",
+                "Dragon", "Dark", "Steel", "Fairy"};
+
+        // Map the type name to file name
+        for(int i = 0; i <= 17; i++){
+            typeImageMap.put(stringTypeList[i], typeNameList[i]);
+        }
 
 
         // Add drop destination
         // Create a new image
-        Image typeImageBlank = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage2/types/Type_Blank.jpg"));
+        Image typeImageBlank = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage/types/Type_Blank.jpg"));
 
         // Create a list of imageViews using the blank type image
         ImageView[] blankImageList = new ImageView[12];
@@ -104,7 +122,7 @@ public class HelloApplication extends Application {
 
         // Add the type tiles
         int j1 = 190;
-        String pathString = "src/main/resources/com/example/pokemontypecoverage2/types/";
+        String pathString = "src/main/resources/com/example/pokemontypecoverage/types/";
         for (int i = 0; i <= 17; i++){
             Image typeImage = new Image(new FileInputStream(pathString+typeNameList[i]+".jpg"));
             typeList[i] = new ImageView(typeImage);
@@ -119,12 +137,12 @@ public class HelloApplication extends Application {
         // Generate blank image tiles
         setBlankTiles(blankImageList, typeImageBlank, list);
         // Create type HashMap
-        typeMap = setTypeHashMap(typeList);
+        typeMap = setTypeHashMap(typeList, stringTypeList);
         // Create Pokémon HashMap
         pokeMap = setPartyHashMap(blankImageList);
 
         // Add event functions to blank tiles
-        setBlankTileEvents(blankImageList, typeImageBlank, pokeParty, pokeMap, typeMap);
+        setBlankTileEvents(blankImageList, typeImageBlank, pokeParty, pokeMap, typeMap, typeImageMap, superEffectiveImageList, resistedImageList);
 
 
 
@@ -135,7 +153,7 @@ public class HelloApplication extends Application {
         clearButton.setLayoutX(370);
         clearButton.setLayoutY(200);
         // Reset all blank tiles
-        setClearButton(clearButton, blankImageList, typeImageBlank, pokeParty);
+        setClearButton(clearButton, blankImageList, typeImageBlank, pokeParty, typeImageMap, superEffectiveImageList, pokeParty.getTypeChart().getBlankType(), resistedImageList);
 
         // Add to scene graph
         list.add(pokeTitle);
@@ -157,7 +175,7 @@ public class HelloApplication extends Application {
         list.add(view);
     }
 
-    // Creates an ImageView for blank tiles and adds drag and drop functionality for each one
+    // Creates an ImageView for blank tiles
     public void setBlankTiles(ImageView[] blankImageList, Image typeImageBlank, ObservableList<Node> list){
         // Initial y position of blank tile
         int j2 = 200;
@@ -180,14 +198,34 @@ public class HelloApplication extends Application {
         }
     }
 
+    // Create the ImageViews in the middle
+    public void createMiddleTiles(ImageView[] viewList, int yPos, ObservableList list){
+        int xPos = 330;
+        int colCount = 1;
+        for(int i = 0; i <=17; i++){
+            viewList[i] =  new ImageView();
+            setImageView(viewList[i], xPos, yPos, list);
+            xPos += 50;
+            colCount += 1;
+            // Every 4 rows move to next row
+            if (colCount > 4){
+                xPos = 330;
+                yPos += 20;
+                colCount = 1;
+            }
+        }
+
+    }
+
 
     // Add drag events to blank tiles
-    public void setBlankTileEvents(ImageView[] blankImageList, Image typeImageBlank, PokemonParty party, HashMap<String, String> pokeMap, HashMap<String, String> typeMap){
+    public void setBlankTileEvents(ImageView[] blankImageList, Image typeImageBlank, PokemonParty party, HashMap<String, String> pokeMap, HashMap<String, String> typeMap, HashMap<String, String> typeImageMap,
+                                   ImageView[] superEffectiveViewList, ImageView[] resistViewList){
         for(ImageView view: blankImageList) {
             // Add drag and drop events
             setDragOver(view);
-            setDragDropped(view, pokeMap, typeMap, party);
-            addClearTile(view, typeImageBlank, pokeMap, party);
+            setDragDropped(view, pokeMap, typeMap, party, typeImageMap, superEffectiveViewList, resistViewList);
+            addClearTile(view, typeImageBlank, pokeMap, party,typeImageMap, superEffectiveViewList, party.getTypeChart().getBlankType(), resistViewList);
         }
     }
 
@@ -201,6 +239,7 @@ public class HelloApplication extends Application {
             String viewID = view.getId();
             // Create a string "xy" x= Pokémon position in party, y = position of type (1 or 2)
             String pokeTypePos = String.valueOf(pokePos) +","+ String.valueOf(typePos);
+            // each mapping should be "blanktile1" = "01" etc.
             pokeTypeHashMap.put(viewID,pokeTypePos);
             typePos += 1;
             // Every 2 types we go to the next Pokémon and reset the type position
@@ -215,9 +254,7 @@ public class HelloApplication extends Application {
     }
 
     // Creates a hashmap of ImageViews (by ID) to Pokémon types
-    public HashMap<String, String> setTypeHashMap(ImageView[] typeList){
-        String[] stringTypeList = {"Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Grass", "Flying", "Psychic", "Bug", "Rock", "Ghost",
-        "Dragon", "Dark", "Steel", "Fairy"};
+    public HashMap<String, String> setTypeHashMap(ImageView[] typeList, String[] stringTypeList){
         HashMap<String, String> typeViewHashMap = new HashMap<>();
         for(int i = 0 ; i <= typeList.length-1 ; i++){
             String viewID = typeList[i].getId();
@@ -228,12 +265,12 @@ public class HelloApplication extends Application {
     }
 
 
-    public void resetPokemonType(String pos, PokemonParty party) {
+    public void resetPokemonType(String pos, PokemonParty party, PokemonType blanktype) {
         String[] posList = pos.split(",");
         // Get the Pokémon
         PokemonParty.Pokemon pokemon = party.getPokemon(Integer.parseInt(posList[0]));
         // Reset its type
-        pokemon.resetType(Integer.parseInt(posList[1]));
+        pokemon.resetType(Integer.parseInt(posList[1]),blanktype, party.getTypeChart().getTypeChart());
 
     }
 
@@ -242,22 +279,73 @@ public class HelloApplication extends Application {
         String[] posList = pos.split(",");
         PokemonParty.Pokemon pokemon = party.getPokemon(Integer.parseInt(posList[0]));
         if(Integer.parseInt(posList[1]) == 1){
-            pokemon.setType1(party.getTypeChart().getType(pokeType));
+            pokemon.setType1(party.getTypeChart().getType(pokeType), party.getTypeChart().getTypeChart());
         }
         else if(Integer.parseInt(posList[1]) == 2){
-            pokemon.setType2(party.getTypeChart().getType(pokeType));
+            pokemon.setType2(party.getTypeChart().getType(pokeType), party.getTypeChart().getTypeChart());
         }
     }
 
     // Generates type tiles for all super effective types
-    // TODO: write this out
-    // TODO: Find a way to update this whenever anything changes
-    public void setSuperEffectiveTiles(ArrayList<String> superEffectiveList, ImageView typeViewList ){
+    public void setSuperEffectiveTiles(HashMap<String, String> superEffImageMap, ImageView[] superEffectiveViewList, ArrayList<String> superEffectives){
+        // Remove the image from each ImageView
+        for(ImageView view: superEffectiveViewList){
+            view.setImage(null);
+        }
+        // Get all super effective types
+        System.out.println("All Super Effective Types: "+superEffectives);
+        int pos = 0;
+        if(!superEffectives.isEmpty()) {
+            for (String type : superEffectives) {
+                // Get the mapped file name
+                String fileName = superEffImageMap.get(type);
+                // Create the type image
+                try {
+                    Image typeImage = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage/types/" + fileName + ".jpg"));
+                    // Set the image of the ImageView
+                    superEffectiveViewList[pos].setImage(typeImage);
+                    pos += 1;
+                } catch (FileNotFoundException e) {
+                    System.out.println("Type: "+type);
+                    System.out.println("FileName: "+fileName);
+                    System.out.print("Some funky stuff happened here");
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+
+    public void setResistTiles(HashMap<String, String> resistImageMap, ImageView[] resistViewList, ArrayList<String> resists){
+        // Remove the image from each ImageView
+        for(ImageView view: resistViewList){
+            view.setImage(null);
+        }
+        // Get all super effective types
+        int pos = 0;
+        if(!resists.isEmpty()) {
+            for (String type : resists) {
+                // Get the mapped file name
+                String fileName = resistImageMap.get(type);
+                // Create the type image
+                try {
+                    Image typeImage = new Image(new FileInputStream("src/main/resources/com/example/pokemontypecoverage/types/" + fileName + ".jpg"));
+                    // Set the image of the ImageView
+                    resistViewList[pos].setImage(typeImage);
+                    pos += 1;
+                } catch (FileNotFoundException e) {
+                    System.out.println("Type: "+type);
+                    System.out.println("FileName: "+fileName);
+                    System.out.print("Some funky stuff happened here");
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
     }
 
     // set button to reset image on blank tiles and reset types for each Pokémon
-    public void setClearButton(Button button, ImageView[] blankImageList, Image typeImageBlank, PokemonParty party){
+    public void setClearButton(Button button, ImageView[] blankImageList, Image typeImageBlank, PokemonParty party, HashMap<String, String> typeImageMap, ImageView[] superEffectiveViewList, PokemonType blankType, ImageView[] resistViewList){
         EventHandler<ActionEvent> action = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -268,13 +356,20 @@ public class HelloApplication extends Application {
                 // Reset the type for each Pokémon
                 for(int i = 0; i <= 5; i++){
                     PokemonParty.Pokemon pokemon = party.getPokemon(i);
-                    pokemon.resetType(1);
-                    pokemon.resetType(2);
+                    pokemon.resetType(1, blankType, party.getTypeChart().getTypeChart());
+                    pokemon.resetType(2, blankType, party.getTypeChart().getTypeChart());
                 }
+                System.out.println("Reset Party");
+                party.buildEffectiveList();
+                party.buildResistanceList();
+                setSuperEffectiveTiles(typeImageMap, superEffectiveViewList, party.getSuperEffectives());
+                setResistTiles(typeImageMap, resistViewList, party.getResistances());
             }
         };
         button.setOnAction(action);
     }
+
+
 
     // Set Drag Started event for an ImageView
     public void setDragStarted(ImageView view){
@@ -310,7 +405,7 @@ public class HelloApplication extends Application {
     }
 
     // Set on Drag Dropped event for an ImageView
-    public void setDragDropped(ImageView view, HashMap<String, String> pokeMap, HashMap<String, String> typeMap, PokemonParty party){
+    public void setDragDropped(ImageView view, HashMap<String, String> pokeMap, HashMap<String, String> typeMap, PokemonParty party, HashMap<String, String> typeImageMap, ImageView[] superEffectiveViewList, ImageView[] resistViewList){
         // Create an event handler
         EventHandler<DragEvent> eHandler = new EventHandler<DragEvent>() {
             @Override
@@ -325,6 +420,10 @@ public class HelloApplication extends Application {
                     String pokeSlot = pokeMap.get(view.getId());
                     setPokemonType(pokeSlot, party, newType);
                 }
+                party.buildEffectiveList();
+                party.buildResistanceList();
+                setSuperEffectiveTiles(typeImageMap, superEffectiveViewList, party.getSuperEffectives());
+                setResistTiles(typeImageMap, resistViewList, party.getResistances());
                 dragEvent.consume();
             }
         };
@@ -334,7 +433,7 @@ public class HelloApplication extends Application {
 
 
     // Adds clearing the tile when clicked
-    public void addClearTile(ImageView view, Image image, HashMap<String, String> typeMap, PokemonParty party){
+    public void addClearTile(ImageView view, Image image, HashMap<String, String> typeMap, PokemonParty party, HashMap<String, String> typeImageMap, ImageView[] superEffectiveViewList, PokemonType blankType, ImageView[] resistViewList){
         view.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -344,7 +443,11 @@ public class HelloApplication extends Application {
                 // FInd the Pokemon and type slot it maps to
                 String pos = typeMap.get(viewID);
                 // Reset the Pokemons type
-                resetPokemonType(pos, party);
+                resetPokemonType(pos, party, blankType);
+                party.buildEffectiveList();
+                party.buildResistanceList();
+                setSuperEffectiveTiles(typeImageMap, superEffectiveViewList, party.getSuperEffectives());
+                setResistTiles(typeImageMap, resistViewList, party.getResistances());
                 mouseEvent.consume();
 
             }

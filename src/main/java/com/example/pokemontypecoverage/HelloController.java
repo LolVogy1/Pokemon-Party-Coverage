@@ -1,4 +1,4 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

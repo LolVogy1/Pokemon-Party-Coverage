@@ -1,6 +1,5 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 // Pokémon party class
@@ -19,12 +18,14 @@ public class PokemonParty {
         // Instantiate 6 pokemon
         party = new Pokemon[6];
         for(int i = 0; i <= 5; i++){
-            party[i] = new Pokemon();
+            party[i] = new Pokemon(typeChart.getBlankType());
         }
 
     }
 
 
+    // I think this is redundant
+    /*
     // Sets the type of a given Pokémon
     public void setPokemonType(int pos, int typePos, PokemonType type){
         if(typePos == 1){
@@ -34,21 +35,31 @@ public class PokemonParty {
             party[pos].setType2(type);
         }
         party[pos].setSuperEffectives();
+        System.out.print("Unga Bunga");
         party[pos].setResistances(typeChart.getTypeChart());
     }
+
+     */
     public void buildEffectiveList(){
+        if(!superEffectives.isEmpty()){
+            superEffectives.clear();
+        }
         // For each Pokémon
         for (Pokemon pokemon : party){
             ArrayList<String> tempEffectives = pokemon.getSuperEffectives();
             for (String type: tempEffectives){
                 if(!superEffectives.contains(type)){
                     superEffectives.add(type);
+                    System.out.println("Added type "+type);
                 }
             }
 
         }
     }
     public void buildResistanceList(){
+        if(!resistances.isEmpty()){
+            resistances.clear();
+        }
         // For each Pokémon in the party
         for (Pokemon pokemon : party){
             // Get all resisted types for that pokemon
@@ -62,7 +73,6 @@ public class PokemonParty {
                 }
             }
         }
-        System.out.println("Added Resistances");
     }
     public PokemonTypeChart getTypeChart(){
         return typeChart;
@@ -103,35 +113,41 @@ public class PokemonParty {
         private ArrayList<PokemonType> resistances;
 
         // Constructor
-        public Pokemon(){
+        public Pokemon(PokemonType blankType){
             superEffectives = new ArrayList<>();
             resistances = new ArrayList<>();
             // Types are initially set to "None" (prevent some potential null errors later)
-            type1 = new PokemonType("None");
-            type2 = new PokemonType("None");
+            type1 = blankType;
+            type2 = blankType;
         }
 
         // Setters
-        public void setType1(PokemonType t1){
+        public void setType1(PokemonType t1, PokemonType[] types){
             type1 = t1;
+            setSuperEffectives();
+            setResistances(types);
         }
 
-        public void setType2(PokemonType t2){
+        public void setType2(PokemonType t2, PokemonType[] types){
             type2 = t2;
+            setSuperEffectives();
+            setResistances(types);
         }
 
-        public void resetType(int typePos){
-            PokemonType blankType = new PokemonType("None");
+        public void resetType(int typePos, PokemonType blankType, PokemonType[] types){
             if (typePos == 1){
-                type1 = blankType;
+                setType1(blankType, types);
             }
             else{
-                type2 = blankType;
+                setType2(blankType, types);
             }
         }
 
         // Set the super effective matchups for the given Pokémon
         public void setSuperEffectives(){
+            if(!superEffectives.isEmpty()){
+                superEffectives.clear();
+            }
             // If the Pokémon has a type
             if(!type1.getTypeName().equals("None")) {
                 // Get all the super effective matchups for type 1
@@ -150,12 +166,15 @@ public class PokemonParty {
             }
             // In case some silly person set type 2 but not type 1
             else if(!type2.getTypeName().equals("None")){
-                superEffectives = type1.getMatchups(2.0);
+                superEffectives = type2.getMatchups(2.0);
 
             }
         }
 
         public void setResistances(PokemonType[] types){
+            if(!resistances.isEmpty()){
+                resistances.clear();
+            }
             // For each type
             for (PokemonType type: types){
                 // Get the types with resistance to that type

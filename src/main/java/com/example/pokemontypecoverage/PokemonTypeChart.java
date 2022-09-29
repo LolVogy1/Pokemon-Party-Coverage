@@ -1,17 +1,18 @@
-package com.example.pokemontypecoverage2;
+package com.example.pokemontypecoverage;
 
-import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class PokemonTypeChart {
     private PokemonType[] types;
+    private PokemonType blankType;
 
     // Constructor
     public PokemonTypeChart(){
         // There's 18 types
         types = new PokemonType[18];
+        blankType = new PokemonType("None");
         // Build the type chart
         try {
             buildTypeChart();
@@ -25,7 +26,7 @@ public class PokemonTypeChart {
     // Has a nested loop but only runs once so ok I guess
     // TODO: Switch to a database for simplicity
     public void buildTypeChart()throws FileNotFoundException {
-        File file = new File("src/main/java/com/example/pokemontypecoverage2/pokemontypechart.txt");
+        File file = new File("src/main/java/com/example/pokemontypecoverage/pokemontypechart.txt");
         Scanner scanner = new Scanner(file);
         // 18 types so 18 lines
         for (int i = 0; i <= 17; i++) {
@@ -58,6 +59,10 @@ public class PokemonTypeChart {
             }
         }
         return type;
+    }
+
+    public PokemonType getBlankType(){
+        return blankType;
     }
 
 
