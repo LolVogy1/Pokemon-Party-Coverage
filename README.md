@@ -1,11 +1,12 @@
 # Pokemon-Party-Coverage
 
-This is currently a work in progress
+V1.0 is complete!
 
 This is an appplication that will let you enter the types of each of the Pokemon in your party and give you the type coverages
 
 ![A screenshot of the app](https://github.com/LolVogy1/Pokemon-Party-Coverage/blob/master/Screenshots/pokePlanner.PNG)
 
+![A screenshot of the output](https://github.com/LolVogy1/Pokemon-Party-Coverage/blob/master/Screenshots/pokeparty2.PNG)
 Type coverages include:
 
 
@@ -13,7 +14,7 @@ All types your party has super effective moves (assuming each pokemon has at lea
 
 All types that your party defends against
 
-All missing types for the above
+All missing types for the above (To be added in a future update)
 
 
 This project is done in Java using JavaFX as the GUI
